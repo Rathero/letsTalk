@@ -26,7 +26,7 @@ RoberDB.prototype.connectDB = function () {
 
 RoberDB.prototype.requestTrendingTalks = function (callback) {
 
-	var sql  = 'SELECT * FROM talks';
+	var sql  = 'SELECT * FROM talks order by `id` desc limit 0,30';
 	var inserts = [];
 	sql = mysql.format(sql, inserts);
 	log.debug(sql);
@@ -36,5 +36,18 @@ RoberDB.prototype.requestTrendingTalks = function (callback) {
 		  callback(err, rows);
 		});
 }
+RoberDB.prototype.saveTalk = function (talk, callback) {
+
+	var sql  = 'INSERT INTO `letstalk_data`.`talks` (`id`, `title`) VALUES (NULL, \'' + talk.title + '\');';
+	var inserts = [];
+	sql = mysql.format(sql, inserts);
+	log.debug(sql);
+		this.connection.query(sql, function(err, rows, fields) {
+		  if (err) throw err;
+		  callback(err, rows);
+		});
+}
+
+
 
 module.exports = RoberDB;
