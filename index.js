@@ -1,8 +1,10 @@
-var cool = require('cool-ascii-faces');
 var express = require('express');
 var app = express();
-
+var roberDB = require('./roberDB');
+var RoberDB = new roberDB('mysql-letstalk.alwaysdata.net', 'letstalk_data', 'letstalk', 'letstalkapp');
+var log = require('color-logs')(true, true, __filename);
 app.set('port', (process.env.PORT || 5000));
+var async = require('async');
 
 app.use(express.static(__dirname + '/public'));
 
@@ -10,28 +12,36 @@ app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
+main();
+
+/* LOGIC */
+
+function main () {
+	log.info('Inicializando mobile-api para Lets Talk...');
+	RoberDB.connectDB();
+}
 app.get('/', function(request, response) {
   response.render('pages/index');
-});
-app.get('/cool', function(request, response) {
-  response.send(cool());
 });
 
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
 
+app.get('/talks', talks);
 
-var pg = require('pg');
+function talks (req, res) {
 
-app.get('/db', function (request, response) {
-  pg.connect("postgres://nipkadgsmcieth:Ta3sO0fTIOKAMeBPgx9cCcfbe7@ec2-54-235-152-114.compute-1.amazonaws.com:5432/dd1l9nnvkv4cm5", function(err, client, done) {
-    client.query('SELECT * FROM test_table', function(err, result) {
-      done();
-      if (err)
-       { console.error(err); response.send("Error " + err); }
-      else
-       { response.send(result.rows); }
-    });
-  });
-})
+	log.info("Req: Talks");
+
+	async.waterfall([
+			function (waterfallCallback) {
+				RoberDB.requestTrendingTalks(function (error, result) {
+					waterfallCallback (error, result);
+				});
+			}
+		]
+		,function (error, result) {
+			res.status(200).json(result)
+	});
+}
