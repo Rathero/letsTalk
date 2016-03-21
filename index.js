@@ -36,6 +36,8 @@ app.get('/talks', talks);
 
 app.post('/talks', postTalk);
 
+app.get('/messages/:talkId', messages);
+
 var callback =  function (error, result, waterfallCallback) {
 					waterfallCallback (error, result);
 				};
@@ -66,4 +68,19 @@ function talks (req, res) {
 		,function (error, result) {
 			res.status(200).json(result)
 	});
+}
+
+function messages(req, res){
+    log.info("Req: GET Messages");
+	async.waterfall([
+			function (waterfallCallback) {
+				RoberDB.requestMessagesByTalk(req.params.talkId, function (error, result) {
+					waterfallCallback (error, result);
+				});
+			}
+		]
+		,function (error, result) {
+			res.status(200).json(result)
+	});
+    
 }

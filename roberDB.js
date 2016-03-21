@@ -36,9 +36,25 @@ RoberDB.prototype.requestTrendingTalks = function (callback) {
 		  callback(err, rows);
 		});
 }
+
+RoberDB.prototype.requestMessagesByTalk = function (id, callback) {
+
+	var sql  = 'SELECT * FROM  `messages` WHERE  `talk_id` =' + id + ' ORDER BY  `creation_date` DESC LIMIT 0 , 30';
+	var inserts = [];
+	sql = mysql.format(sql, inserts);
+	log.debug(sql);
+		this.connection.query(sql, function(err, rows, fields) {
+		  if (err) throw err;
+
+		  callback(err, rows);
+		});
+}
+
 RoberDB.prototype.saveTalk = function (talk, callback) {
 
-	var sql  = 'INSERT INTO `letstalk_data`.`talks` (`id`, `title`) VALUES (NULL, \'' + talk.title + '\');';
+	var sql  = 'INSERT INTO `letstalk_data`.`talks` "' +
+    + '(`id`, `title`, `description`,`user_creator`) VALUES ' + 
+    + '(NULL, \'' + talk.title + '\',\'' + talk.description + '\',1);';
 	var inserts = [];
 	sql = mysql.format(sql, inserts);
 	log.debug(sql);
