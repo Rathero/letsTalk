@@ -52,9 +52,19 @@ RoberDB.prototype.requestMessagesByTalk = function (id, callback) {
 
 RoberDB.prototype.saveTalk = function (talk, callback) {
 
-	var sql  = 'INSERT INTO `letstalk_data`.`talks` "' +
-    + '(`id`, `title`, `description`,`user_creator`) VALUES ' + 
-    + '(NULL, \'' + talk.title + '\',\'' + talk.description + '\',1);';
+	var sql  = 'INSERT INTO `letstalk_data`.`talks`(`id`, `title`, `description`,`user_creator`) VALUES (NULL, \'' + talk.title + '\',\'' + talk.description + '\',1);';
+	var inserts = [];
+	sql = mysql.format(sql, inserts);
+	log.debug(sql);
+		this.connection.query(sql, function(err, rows, fields) {
+		  if (err) throw err;
+		  callback(err, rows);
+		});
+}
+
+RoberDB.prototype.saveMessage = function (message, callback) {
+
+	var sql  = 'INSERT INTO `letstalk_data`.`messages` (`id`, `text`, `user`,`creation_date`,`talk_id`) VALUES (NULL, \'' + message.text + '\',1,now(),' + message.talkId + ');';
 	var inserts = [];
 	sql = mysql.format(sql, inserts);
 	log.debug(sql);
