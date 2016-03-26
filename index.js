@@ -12,9 +12,6 @@ app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 })); 
-// views is directory for all template files
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
 
 main();
 
@@ -38,7 +35,7 @@ app.post('/talks', postTalk);
 
 app.post('/messages', postMessage);
 
-app.get('/messages/:talkId', messages);
+app.get('/talks/:talkId/messages', messages);
 
 var callback =  function (error, result, waterfallCallback) {
 					waterfallCallback (error, result);
