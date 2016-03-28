@@ -50,6 +50,19 @@ RoberDB.prototype.requestMessagesByTalk = function (id, callback) {
 		});
 }
 
+
+RoberDB.prototype.requestTalksByCategory = function (id, callback) {
+	var sql  = 'SELECT t.* FROM `talks` t inner join `categories_talks` ct on ct.talk_id = t.id inner join `categories` c on c.id = category_id where c.id = ' + id;
+	var inserts = [];
+	sql = mysql.format(sql, inserts);
+	log.debug(sql);
+		this.connection.query(sql, function(err, rows, fields) {
+		  if (err) throw err;
+
+		  callback(err, rows);
+		});
+}
+
 RoberDB.prototype.saveTalk = function (talk, callback) {
 
 	var sql  = 'INSERT INTO `letstalk_data`.`talks`(`id`, `title`, `description`,`user_creator`) VALUES (NULL, \'' + talk.title + '\',\'' + talk.description + '\',1);';
@@ -70,6 +83,20 @@ RoberDB.prototype.saveMessage = function (message, callback) {
 	log.debug(sql);
 		this.connection.query(sql, function(err, rows, fields) {
 		  if (err) throw err;
+		  callback(err, rows);
+		});
+}
+
+
+RoberDB.prototype.requestCategories = function (callback) {
+
+	var sql  = 'SELECT * FROM categories';
+	var inserts = [];
+	sql = mysql.format(sql, inserts);
+	log.debug(sql);
+		this.connection.query(sql, function(err, rows, fields) {
+		  if (err) throw err;
+
 		  callback(err, rows);
 		});
 }

@@ -37,10 +37,28 @@ app.post('/messages', postMessage);
 
 app.get('/talks/:talkId/messages', messages);
 
+app.get('/categories', categories);
+
+app.get('/categories/:categoryId/talks', talksByCategory);
+
 var callback =  function (error, result, waterfallCallback) {
 					waterfallCallback (error, result);
 				};
 
+
+function categories(req, res){
+	log.info("Req: categories");
+	async.waterfall([
+			function (waterfallCallback) {
+				RoberDB.requestCategories(function (error, result) {
+					waterfallCallback (error, result);
+				});
+			}
+		]
+		,function (error, result) {
+			res.status(200).json(result)
+	});
+}
 function postTalk(req, res){
     log.info("Req: POST Talk");
 	async.waterfall([
@@ -74,6 +92,21 @@ function messages(req, res){
 	async.waterfall([
 			function (waterfallCallback) {
 				RoberDB.requestMessagesByTalk(req.params.talkId, function (error, result) {
+					waterfallCallback (error, result);
+				});
+			}
+		]
+		,function (error, result) {
+			res.status(200).json(result)
+	});
+    
+}
+
+function talksByCategory(req, res){
+    log.info("Req: GET talksByCategory");
+	async.waterfall([
+			function (waterfallCallback) {
+				RoberDB.requestTalksByCategory(req.params.categoryId, function (error, result) {
 					waterfallCallback (error, result);
 				});
 			}
